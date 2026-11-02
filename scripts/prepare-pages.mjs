@@ -14,3 +14,4 @@ writeFileSync(path.join(docs, ".nojekyll"), "");
 writeFileSync(path.join(root, ".nojekyll"), "");
 
 console.log("Prepared GitHub Pages in docs/ with .nojekyll and 404.html");
+
