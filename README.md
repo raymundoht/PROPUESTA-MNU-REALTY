@@ -1,36 +1,38 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# MNU Realty
 
-## Getting Started
+Plataforma inmobiliaria de MNU Realty (mnurealty.com): catálogo, fichas de propiedad, perfiles de asesores y WhatsApp directo por asesor.
 
-First, run the development server:
+**Estado:** Fase 1 (portal público) construida con **datos de ejemplo**. La arquitectura, los roles, las integraciones, los costos y las fases están en [docs/ARQUITECTURA.md](docs/ARQUITECTURA.md); el modelo de datos, en [db/schema.sql](db/schema.sql).
+
+## Correr en tu computadora
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+cp .env.example .env.local   # opcional: pon tu número en DEMO_WHATSAPP_NUMBER
+npm install
+npm run dev                  # http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Estructura
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```
+src/
+  app/                     rutas (una carpeta = una URL)
+    page.tsx               landing
+    propiedades/           catálogo, /venta, /renta y [slug] (ficha)
+    asesores/              listado y [slug] (perfil público)
+    mapa/ contacto/ nosotros/ favoritos/ login/
+    api/leads              solicitudes de información / visitas
+    api/track              estadísticas (vistas, clics de WhatsApp)
+  components/              UI (property/, search/, agent/, forms/, layout/)
+  lib/
+    repo.ts                ÚNICO acceso a datos (hoy demo → mañana PostgreSQL)
+    demo-data.ts           datos de ejemplo (se elimina en Fase 2)
+    format.ts              precios, mensaje y enlace de WhatsApp
+db/schema.sql              PostgreSQL + PostGIS, multiempresa
+brand/                     logo original y referencias de diseño
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Identidad visual
+- Logo dorado metálico: va sobre fondos oscuros (encabezado y pie en carbón `#151512`).
+- Base marfil `#F7F4EC`, oro `#B79951` como acento, verde `#1F6B4A` = venta, azul `#2457A6` = renta.
+- Tipografías: Plus Jakarta Sans (interfaz) y DM Serif Display (títulos).
