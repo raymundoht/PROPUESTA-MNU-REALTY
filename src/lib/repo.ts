@@ -7,7 +7,8 @@
  */
 import "server-only";
 import { cacheLife, cacheTag } from "next/cache";
-import { demoAgents, demoProperties } from "./demo-data";
+import { HERO_PICKS, demoAgents, demoProperties } from "./demo-data";
+import { formatPrice, propertyTypes } from "./format";
 import type { Agent, Paginated, Property, PropertyFilters, PropertyType } from "./types";
 
 const PAGE_SIZE = 9;
@@ -153,6 +154,47 @@ export async function getTypeCounts() {
   const counts: Partial<Record<PropertyType, number>> = {};
   for (const p of await allPublic()) counts[p.type] = (counts[p.type] ?? 0) + 1;
   return counts;
+}
+
+export interface HeroItem {
+  type: PropertyType;
+  image: string;
+  slug: string;
+  title: string;
+  place: string;
+  price: string;
+  specs: string[];
+}
+
+/** Una propiedad destacada por tipo para el hero de inicio (ver HERO_PICKS). */
+export async function getHeroShowcase(): Promise<HeroItem[]> {
+  "use cache";
+  cacheLife("hours");
+  const all = await allPublic();
+  const items: HeroItem[] = [];
+  for (const type of propertyTypes) {
+    const pick = HERO_PICKS[type];
+    const p =
+      all.find((x) => x.id === pick.id) ??
+      all.find((x) => x.type === type && x.featured) ??
+      all.find((x) => x.type === type && x.images.length);
+    if (!p?.images.length) continue;
+    const area = p.constructionM2 ?? p.landM2;
+    items.push({
+      type,
+      image: p.images[p.id === pick.id ? (pick.image ?? 0) : 0] ?? p.images[0],
+      slug: p.slug,
+      title: p.title,
+      place: `${p.colonia}, ${p.city}`,
+      price: formatPrice(p),
+      specs: [
+        p.bedrooms != null ? `${p.bedrooms} rec.` : null,
+        p.bathrooms != null ? `${p.bathrooms} baños` : null,
+        area != null ? `${area.toLocaleString("es-MX")} m²` : null,
+      ].filter((x): x is string => !!x),
+    });
+  }
+  return items;
 }
 
 export async function getAmenities() {

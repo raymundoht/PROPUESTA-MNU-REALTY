@@ -13,7 +13,7 @@ CREATE EXTENSION IF NOT EXISTS pg_trgm;   -- búsqueda por texto (colonia, títu
 CREATE TYPE user_role        AS ENUM ('super_admin', 'admin', 'agent');
 CREATE TYPE user_status      AS ENUM ('active', 'suspended');
 CREATE TYPE operation_type   AS ENUM ('venta', 'renta');
-CREATE TYPE property_type    AS ENUM ('casa', 'departamento', 'terreno', 'local', 'oficina');
+CREATE TYPE property_type    AS ENUM ('casa', 'departamento', 'oficina', 'terreno', 'local', 'bodega', 'proyecto');
 CREATE TYPE availability     AS ENUM ('disponible', 'apartada', 'vendida', 'rentada');
 CREATE TYPE publish_status   AS ENUM ('borrador', 'en_revision', 'publicada', 'rechazada', 'oculta');
 CREATE TYPE lead_stage       AS ENUM ('nuevo', 'contactado', 'visita_programada', 'negociacion', 'cerrado', 'perdido');

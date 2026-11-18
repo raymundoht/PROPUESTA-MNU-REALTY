@@ -7,16 +7,19 @@ const mxn = new Intl.NumberFormat("es-MX", {
   maximumFractionDigits: 0,
 });
 
-export function formatPrice(p: Pick<Property, "price" | "currency" | "operation">) {
-  const base =
+export function formatPrice(p: Pick<Property, "price" | "currency" | "operation" | "priceUnit">) {
+  if (!p.price) return "Precio a consultar";
+  const amount =
     p.currency === "USD"
       ? `${new Intl.NumberFormat("es-MX", { maximumFractionDigits: 0 }).format(p.price)} USD`
       : `${mxn.format(p.price)} MXN`;
-  return p.operation === "renta" ? `${base} / mes` : base;
+  const base = p.priceUnit ? `${amount} / ${p.priceUnit === "m2" ? "m²" : "ha"}` : amount;
+  return p.operation === "renta" && !p.priceUnit ? `${base} / mes` : base;
 }
 
 /** Formato corto para pines del mapa: $3.5 M, $18,000 */
 export function formatPriceShort(price: number) {
+  if (!price) return "Consultar";
   if (price >= 1_000_000) {
     const m = price / 1_000_000;
     return `$${m.toFixed(m >= 10 ? 0 : 1).replace(/\.0$/, "")} M`;
@@ -24,21 +27,28 @@ export function formatPriceShort(price: number) {
   return `$${new Intl.NumberFormat("es-MX").format(price)}`;
 }
 
+// El orden de estas llaves es el orden en que se muestran los tipos en todo el sitio.
 export const typeLabel: Record<PropertyType, string> = {
   casa: "Casa",
   departamento: "Departamento",
+  oficina: "Oficina",
   terreno: "Terreno",
   local: "Local comercial",
-  oficina: "Oficina",
+  bodega: "Bodega / nave",
+  proyecto: "Proyecto",
 };
 
 export const typeLabelPlural: Record<PropertyType, string> = {
   casa: "Casas",
   departamento: "Departamentos",
-  terreno: "Terrenos",
-  local: "Locales comerciales",
   oficina: "Oficinas",
+  terreno: "Terrenos",
+  local: "Locales",
+  bodega: "Bodegas y naves",
+  proyecto: "Proyectos",
 };
+
+export const propertyTypes = Object.keys(typeLabel) as PropertyType[];
 
 export const operationLabel: Record<Operation, string> = {
   venta: "En venta",
@@ -57,7 +67,7 @@ export function propertyUrl(p: Pick<Property, "slug">) {
 }
 
 /** Mensaje prellenado para WhatsApp con los datos de la propiedad. */
-export function whatsappMessage(p: Pick<Property, "title" | "price" | "currency" | "operation" | "slug">) {
+export function whatsappMessage(p: Pick<Property, "title" | "price" | "currency" | "operation" | "priceUnit" | "slug">) {
   return `Hola, me interesa la propiedad ${p.title}, con un precio de ${formatPrice(p)}. Me gustaría recibir más información. Enlace: ${propertyUrl(p)}`;
 }
 

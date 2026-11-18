@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Link from "next/link";
 import { Bath, BedDouble, Car, MapPin, Maximize2 } from "lucide-react";
 import type { Agent, Property } from "@/lib/types";
@@ -6,6 +5,7 @@ import { formatPrice, typeLabel, whatsappMessage } from "@/lib/format";
 import { OperationBadge, StatusBadge } from "./badges";
 import { FavoriteButton } from "./favorite-button";
 import { WhatsAppButton } from "./whatsapp-button";
+import { CardSlider } from "./card-slider";
 
 export function PropertySpecs({ p, className = "" }: { p: Property; className?: string }) {
   const area = p.constructionM2 ?? p.landM2;
@@ -46,22 +46,22 @@ export function PropertyCard({ property: p, agent, layout = "grid", priority }: 
       }`}
     >
       <div className={`relative overflow-hidden bg-sand ${list ? "aspect-[4/3] sm:aspect-auto sm:w-[42%] sm:shrink-0" : "aspect-[4/3]"}`}>
-        <Image
-          src={p.images[0]}
+        <CardSlider
+          images={p.images}
           alt={p.title}
-          fill
+          href={href}
           priority={priority}
+          dimmed={inactive}
           sizes={list ? "(min-width: 640px) 360px, 100vw" : "(min-width: 1024px) 400px, (min-width: 640px) 50vw, 100vw"}
-          className={`object-cover transition-transform duration-700 ease-out-soft group-hover:scale-[1.04] ${inactive ? "grayscale-[60%]" : ""}`}
         />
-        <div className="absolute inset-x-0 top-0 flex items-start justify-between p-3">
+        <div className="pointer-events-none absolute inset-x-0 top-0 z-[2] flex items-start justify-between p-3">
           <div className="flex gap-1.5">
             <OperationBadge op={p.operation} />
             <StatusBadge status={p.status} />
           </div>
           <FavoriteButton
             id={p.id}
-            className="relative z-10 grid size-9 place-items-center rounded-full bg-white/90 text-ink shadow-sm backdrop-blur transition hover:bg-white"
+            className="pointer-events-auto relative z-10 grid size-9 place-items-center rounded-full bg-white/90 text-ink shadow-sm backdrop-blur transition hover:bg-white"
           />
         </div>
       </div>

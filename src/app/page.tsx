@@ -1,22 +1,11 @@
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, Building2, Home, LandPlot, Map as MapIcon, MessageCircle, ShieldCheck, Store, Briefcase, UserRound } from "lucide-react";
-import { HeroSearch } from "@/components/search/hero-search";
+import { ArrowRight, Map as MapIcon, MessageCircle, ShieldCheck, UserRound } from "lucide-react";
+import { HeroShowcase } from "@/components/home/hero-showcase";
 import { PropertyCard } from "@/components/property/property-card";
 import { AgentCard } from "@/components/agent/agent-card";
 import { LeadForm } from "@/components/forms/lead-form";
-import { getAgents, getCities, getFeaturedProperties, getRecentProperties, getTypeCounts } from "@/lib/repo";
-import { HERO_IMAGE } from "@/lib/demo-data";
-import { typeLabelPlural } from "@/lib/format";
-import type { PropertyType } from "@/lib/types";
-
-const typeIcons: Record<PropertyType, typeof Home> = {
-  casa: Home,
-  departamento: Building2,
-  terreno: LandPlot,
-  local: Store,
-  oficina: Briefcase,
-};
+import { getAgents, getAllPublicProperties, getCities, getFeaturedProperties, getRecentProperties, getHeroShowcase } from "@/lib/repo";
 
 function SectionHeader({ eyebrow, title, href, cta }: { eyebrow: string; title: string; href?: string; cta?: string }) {
   return (
@@ -36,36 +25,24 @@ function SectionHeader({ eyebrow, title, href, cta }: { eyebrow: string; title: 
 }
 
 export default async function HomePage() {
-  const [featured, recent, agents, cities, typeCounts] = await Promise.all([
+  const [featured, recent, agents, cities, hero, all] = await Promise.all([
     getFeaturedProperties(3),
     getRecentProperties(6),
     getAgents(),
     getCities(),
-    getTypeCounts(),
+    getHeroShowcase(),
+    getAllPublicProperties(),
   ]);
   const agentById = new Map(agents.map((a) => [a.id, a]));
-  const types = (Object.keys(typeLabelPlural) as PropertyType[]).filter((t) => typeCounts[t]);
+  // Para el filtro del hero: solo lo que pinta una tarjeta (sin descripciones), destacadas primero.
+  const listings = all
+    .filter((p) => p.status === "disponible" || p.status === "apartada")
+    .map((p) => ({ ...p, description: "", amenities: [], images: p.images.slice(0, 6) }))
+    .sort((a, b) => Number(b.featured) - Number(a.featured) || b.publishedAt.localeCompare(a.publishedAt));
 
   return (
     <>
-      {/* Hero */}
-      <section className="relative isolate flex min-h-[640px] items-end overflow-hidden bg-ink pt-[68px] sm:min-h-[720px] lg:min-h-[86vh]">
-        <Image src={HERO_IMAGE} alt="" fill priority sizes="100vw" className="-z-10 object-cover" />
-        <div className="absolute inset-0 -z-10 bg-[linear-gradient(180deg,rgb(21_21_18/0.55)_0%,rgb(21_21_18/0.15)_35%,rgb(21_21_18/0.75)_100%)]" />
-        <div className="absolute inset-0 -z-10 bg-[linear-gradient(90deg,rgb(21_21_18/0.6)_0%,rgb(21_21_18/0.2)_55%,transparent_100%)]" />
-        <div className="container-x pb-14 sm:pb-20">
-          <p className="text-xs font-semibold tracking-[0.22em] text-gold-light uppercase">MNU Realty</p>
-          <h1 className="mt-4 max-w-3xl font-display text-[2.6rem] leading-[1.05] text-ivory sm:text-6xl lg:text-7xl">
-            El lugar correcto, con la persona correcta.
-          </h1>
-          <p className="mt-5 max-w-xl text-base text-ivory/80 sm:text-lg">
-            Casas, departamentos, terrenos y locales en venta y renta. Habla directo con el asesor de cada propiedad.
-          </p>
-          <div className="mt-9">
-            <HeroSearch />
-          </div>
-        </div>
-      </section>
+      <HeroShowcase items={hero} listings={listings} agents={agents} />
 
       {/* Destacadas */}
       {featured.length > 0 && (
@@ -78,31 +55,6 @@ export default async function HomePage() {
           </div>
         </section>
       )}
-
-      {/* Por tipo */}
-      <section className="border-y border-line bg-white">
-        <div className="container-x py-16 sm:py-20">
-          <SectionHeader eyebrow="Explora" title="¿Qué estás buscando?" />
-          <div className="mt-10 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
-            {types.map((t) => {
-              const Icon = typeIcons[t];
-              return (
-                <Link
-                  key={t}
-                  href={`/propiedades?tipo=${t}`}
-                  className="group flex flex-col justify-between rounded-card border border-line bg-ivory/60 p-5 transition-colors duration-300 hover:border-gold/60 hover:bg-ivory"
-                >
-                  <Icon className="size-7 text-gold-deep" strokeWidth={1.5} />
-                  <div className="mt-8">
-                    <p className="font-semibold">{typeLabelPlural[t]}</p>
-                    <p className="text-xs text-muted">{typeCounts[t]} disponibles</p>
-                  </div>
-                </Link>
-              );
-            })}
-          </div>
-        </div>
-      </section>
 
       {/* Por ubicación */}
       <section className="container-x py-20 sm:py-24">

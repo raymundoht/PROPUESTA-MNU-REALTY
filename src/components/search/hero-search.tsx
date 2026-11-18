@@ -24,7 +24,7 @@ const budgets: Record<Operation, { label: string; value: string }[]> = {
   ],
 };
 
-export function HeroSearch() {
+export function HeroSearch({ type }: { type?: PropertyType } = {}) {
   const router = useRouter();
   const [op, setOp] = useState<Operation>("venta");
 
@@ -71,7 +71,7 @@ export function HeroSearch() {
         </label>
         <label className="flex flex-col rounded-xl px-3.5 py-2 transition-colors focus-within:bg-ivory md:border-l md:border-line md:rounded-l-none">
           <span className="text-[11px] font-semibold tracking-wide text-muted uppercase">Inmueble</span>
-          <select name={P.type} className="-ml-1 bg-transparent py-0.5 text-[15px] text-ink outline-none" defaultValue="">
+          <select key={type} name={P.type} className="-ml-1 bg-transparent py-0.5 text-[15px] text-ink outline-none" defaultValue={type ?? ""}>
             <option value="">Todos</option>
             {types.map(([v, l]) => (
               <option key={v} value={v}>{l}</option>

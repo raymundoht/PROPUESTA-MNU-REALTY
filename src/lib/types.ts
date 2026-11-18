@@ -2,7 +2,7 @@
 // Refleja las tablas de db/schema.sql (nombres en camelCase).
 
 export type Operation = "venta" | "renta";
-export type PropertyType = "casa" | "departamento" | "terreno" | "local" | "oficina";
+export type PropertyType = "casa" | "departamento" | "oficina" | "terreno" | "local" | "bodega" | "proyecto";
 export type Availability = "disponible" | "apartada" | "vendida" | "rentada";
 
 export interface Agent {
@@ -35,6 +35,8 @@ export interface Property {
   status: Availability;
   price: number;
   currency: "MXN" | "USD";
+  /** Si el precio es por unidad de superficie (terrenos comerciales). */
+  priceUnit?: "m2" | "ha";
   /** Solo renta: periodo del precio. */
   rentPeriod?: "mes";
   state: string;

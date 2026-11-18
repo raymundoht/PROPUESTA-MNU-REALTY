@@ -2,7 +2,6 @@ import type { Metadata, Viewport } from "next";
 import { DM_Serif_Display, Plus_Jakarta_Sans } from "next/font/google";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
-import { DemoBanner } from "@/components/layout/demo-banner";
 import { site } from "@/lib/site";
 import "./globals.css";
 
@@ -24,7 +23,6 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="es-MX" className={`${jakarta.variable} ${serif.variable} h-full antialiased`}>
       <body className="flex min-h-full flex-col">
-        {site.demoMode && <DemoBanner />}
         <Header />
         <main className="flex-1">{children}</main>
         <Footer />

@@ -1,4 +1,5 @@
 import type { Operation, PropertyFilters, PropertyType } from "./types";
+import { propertyTypes } from "./format";
 
 // Nombres de parámetros en la URL (en español, para URLs legibles y compartibles).
 export const P = {
@@ -18,7 +19,7 @@ export const P = {
 } as const;
 
 const OPS: Operation[] = ["venta", "renta"];
-const TYPES: PropertyType[] = ["casa", "departamento", "terreno", "local", "oficina"];
+const TYPES: PropertyType[] = propertyTypes;
 const SORTS = ["recientes", "precio-asc", "precio-desc"] as const;
 
 type Raw = Record<string, string | string[] | undefined>;

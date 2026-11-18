@@ -28,6 +28,23 @@
   --shadow-float: 0 24px 60px -20px rgb(21 21 18 / 0.45);
 
   --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
+
+  --animate-hero-in: hero-in 700ms var(--ease-out-soft) both;
+  --animate-camera-drift: camera-drift 20s ease-in-out infinite alternate;
+  @keyframes camera-drift {
+    from {
+      transform: scale(1) translate3d(0, 0, 0);
+    }
+    to {
+      transform: scale(1.1) translate3d(-1.5%, -1%, 0);
+    }
+  }
+  @keyframes hero-in {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+  }
 }
 
 html {
@@ -55,6 +72,12 @@ body {
 
 @utility container-x {
   @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8;
+}
+@utility no-scrollbar {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
 }
 @utility eyebrow {
   @apply text-xs font-semibold tracking-[0.18em] text-gold-deep uppercase;

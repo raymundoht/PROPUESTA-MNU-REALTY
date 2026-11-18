@@ -1,10 +1,10 @@
 import Link from "next/link";
 import { Logo } from "./logo";
 import { nav, site } from "@/lib/site";
-import { typeLabelPlural } from "@/lib/format";
+import { propertyTypes, typeLabelPlural } from "@/lib/format";
 import type { PropertyType } from "@/lib/types";
 
-const types: PropertyType[] = ["casa", "departamento", "terreno", "local", "oficina"];
+const types: PropertyType[] = propertyTypes;
 
 export function Footer() {
   return (
