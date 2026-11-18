@@ -76,7 +76,7 @@ export class HeroEngine {
     this.renderer.toneMapping = THREE.AgXToneMapping;
     this.renderer.toneMappingExposure = 1.15;
     this.renderer.shadowMap.enabled = true;
-    this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    this.renderer.shadowMap.type = THREE.PCFShadowMap;
 
     const skyMat = new THREE.ShaderMaterial({
       vertexShader: skyVertex,
@@ -190,6 +190,8 @@ export class HeroEngine {
     if (!parent) return;
     const w = parent.clientWidth;
     const h = parent.clientHeight;
+    // Pestaña en segundo plano o aún sin maquetar: no hay tamaño todavía.
+    if (!w || !h) return;
     this.renderer.setSize(w, h, false);
     this.composer.setSize(w, h);
     this.ao?.setSize(w, h);
@@ -224,6 +226,7 @@ export class HeroEngine {
   private loop = () => {
     if (!this.running) return;
     this.frame = requestAnimationFrame(this.loop);
+    if (!this.renderer.domElement.width) this.resize();
     this.placeCamera(this.clock.getElapsedTime());
     this.composer.render();
   };
@@ -250,6 +253,7 @@ export class HeroEngine {
     if (!ctx) return out;
     const prev = this.current;
     const src = this.renderer.domElement;
+    if (!src.width || !src.height) return out;
     for (const type of types) {
       this.setScene(type, false);
       this.placeCamera(0);

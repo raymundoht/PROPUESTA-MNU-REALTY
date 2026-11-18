@@ -14,7 +14,13 @@ interface Props {
   submitLabel?: string;
 }
 
+// En la versión estática (GitHub Pages) no hay servidor que reciba el formulario.
+const STATIC_SITE = process.env.NEXT_PUBLIC_STATIC_EXPORT === "true";
+
 async function send(_: State, form: FormData): Promise<State> {
+  if (STATIC_SITE) {
+    return { ok: false, error: "Versión de demostración: el formulario no envía datos. Escríbenos por WhatsApp desde la ficha de la propiedad." };
+  }
   const body = Object.fromEntries(form.entries());
   try {
     const res = await fetch("/api/leads", {

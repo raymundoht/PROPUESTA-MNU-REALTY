@@ -44,13 +44,30 @@ export function Hero3D({
         const e = new HeroEngine(el, reduced);
         engine.current = e;
         const { type: first, types: all } = latest.current;
-        latest.current.onThumbs(e.thumbnails(all));
+        // Las miniaturas son un extra: si la pestaña aún no tiene tamaño se reintentan al tenerlo.
+        let thumbsDone = false;
+        const tryThumbs = () => {
+          if (thumbsDone) return;
+          try {
+            const t = e.thumbnails(all);
+            if (!Object.keys(t).length) return;
+            thumbsDone = true;
+            latest.current.onThumbs(t);
+            if (shown.current) e.setScene(shown.current, false);
+          } catch {
+            thumbsDone = true;
+          }
+        };
+        tryThumbs();
         e.setScene(first);
         shown.current = first;
         e.start();
         setVisible(true);
 
-        const ro = new ResizeObserver(() => e.resize());
+        const ro = new ResizeObserver(() => {
+          e.resize();
+          tryThumbs();
+        });
         ro.observe(el.parentElement!);
         // Pausa cuando el hero no se ve, para no gastar batería.
         const io = new IntersectionObserver(([entry]) => (entry.isIntersecting ? e.start() : e.stop()));

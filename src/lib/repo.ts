@@ -9,9 +9,8 @@ import "server-only";
 import { cacheLife, cacheTag } from "next/cache";
 import { HERO_PICKS, demoAgents, demoProperties } from "./demo-data";
 import { formatPrice, propertyTypes } from "./format";
+import { filterProperties } from "./search";
 import type { Agent, Paginated, Property, PropertyFilters, PropertyType } from "./types";
-
-const PAGE_SIZE = 9;
 
 async function allPublic(): Promise<Property[]> {
   return demoProperties;
@@ -25,42 +24,15 @@ export async function searchProperties(f: PropertyFilters): Promise<Paginated<Pr
   "use cache";
   cacheLife("minutes");
   cacheTag("properties");
+  return filterProperties(await allPublic(), f);
+}
 
-  const q = f.q?.trim().toLowerCase();
-  let items = (await allPublic()).filter((p) => {
-    if (f.operation && p.operation !== f.operation) return false;
-    if (f.type && p.type !== f.type) return false;
-    if (f.city && p.city !== f.city) return false;
-    if (q && !`${p.title} ${p.colonia} ${p.city} ${p.state}`.toLowerCase().includes(q)) return false;
-    if (f.minPrice && p.price < f.minPrice) return false;
-    if (f.maxPrice && p.price > f.maxPrice) return false;
-    if (f.beds && (p.bedrooms ?? 0) < f.beds) return false;
-    if (f.baths && (p.bathrooms ?? 0) < f.baths) return false;
-    if (f.minM2 && (p.constructionM2 ?? p.landM2 ?? 0) < f.minM2) return false;
-    if (f.amenity && !p.amenities.includes(f.amenity)) return false;
-    return true;
-  });
-
-  // Disponibles primero; luego el orden pedido.
-  const rank = (p: Property) => (p.status === "disponible" ? 0 : p.status === "apartada" ? 1 : 2);
-  items = items.sort((a, b) => {
-    const r = rank(a) - rank(b);
-    if (r) return r;
-    if (f.sort === "precio-asc") return a.price - b.price;
-    if (f.sort === "precio-desc") return b.price - a.price;
-    return b.publishedAt.localeCompare(a.publishedAt);
-  });
-
-  const total = items.length;
-  const pageCount = Math.max(1, Math.ceil(total / PAGE_SIZE));
-  const page = Math.min(Math.max(1, f.page ?? 1), pageCount);
-  return {
-    items: items.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE),
-    total,
-    page,
-    pageSize: PAGE_SIZE,
-    pageCount,
-  };
+/** Todo lo publicado, sin descripciones: lo necesario para filtrar y pintar tarjetas en el navegador. */
+export async function getCatalogListings(): Promise<Property[]> {
+  "use cache";
+  cacheLife("minutes");
+  cacheTag("properties");
+  return (await allPublic()).map((p) => ({ ...p, description: "", images: p.images.slice(0, 6) }));
 }
 
 export async function getFeaturedProperties(limit = 6) {

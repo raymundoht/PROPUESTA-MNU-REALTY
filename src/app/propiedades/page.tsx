@@ -7,13 +7,12 @@ export const metadata: Metadata = {
   alternates: { canonical: "/propiedades" },
 };
 
-export default function Page({ searchParams }: PageProps<"/propiedades">) {
+export default function Page() {
   return (
     <CatalogPage
       eyebrow="Catálogo"
       title="Todas las propiedades"
       intro="Inmuebles publicados por los asesores de MNU Realty. Filtra por zona, precio y características."
-      searchParams={searchParams}
       basePath="/propiedades"
     />
   );

@@ -7,13 +7,12 @@ export const metadata: Metadata = {
   alternates: { canonical: "/propiedades/renta" },
 };
 
-export default function Page({ searchParams }: PageProps<"/propiedades/renta">) {
+export default function Page() {
   return (
     <CatalogPage
       eyebrow="Rentar"
       title="Propiedades en renta"
       intro="Departamentos, casas y espacios comerciales listos para ocupar."
-      searchParams={searchParams}
       basePath="/propiedades/renta"
       preset={{ operation: "renta" }}
     />
