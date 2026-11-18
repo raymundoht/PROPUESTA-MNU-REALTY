@@ -20,14 +20,17 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
         with:
           node-version: 22
           cache: npm
       - run: npm ci
-      # Las rutas /api necesitan servidor; en la versión estática no existen.
-      - run: rm -rf src/app/api
+      # Las rutas /api, robots y sitemap dinámicos necesitan servidor; en la versión
+      # estática se quitan y se usa un robots.txt fijo (la demo no debe indexarse).
+      - run: |
+          rm -rf src/app/api src/app/robots.ts src/app/sitemap.ts
+          printf 'User-agent: *\nDisallow: /\n' > public/robots.txt
       - run: npm run build
         env:
           GITHUB_PAGES: "true"
